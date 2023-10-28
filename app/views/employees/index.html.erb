@@ -1,0 +1,31 @@
+<h1>Employees</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>First name</th>
+      <th>Last name</th>
+      <th>Phone</th>
+      <th>Email</th>
+      <th>Birthday</th>
+      <th>Country</th>
+      <th>Active</th>
+      <th colspan="1"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @employees.each do |employee| %>
+      <tr>
+        <td><%= employee.first_name %></td>
+        <td><%= employee.last_name %></td>
+        <td><%= employee.phone %></td>
+        <td><%= employee.email %></td>
+        <td><%= employee.birthday %></td>
+        <td><%= employee.country %></td>
+        <td><%= employee.active %></td>
+        <td><%= link_to 'Show', employee %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
