@@ -7,8 +7,15 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
-
+Company.destroy_all
 Employee.destroy_all
+
+10.times do
+  Company.create(
+    name: Faker::Company.name
+  )
+end
+
 123.times do
   Employee.create(
     first_name: Faker::Name.first_name,
@@ -17,6 +24,7 @@ Employee.destroy_all
     email: Faker::Internet.email,
     birthday: Faker::Date.birthday(min_age: 18, max_age: 65),
     country: Faker::Address.country,
-    active: Faker::Boolean.boolean
+    active: Faker::Boolean.boolean,
+    company_id: Company.all.sample.id
   )
 end
