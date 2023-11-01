@@ -1,30 +1,32 @@
-<h1>Employees</h1>
 <%#= sort_link(@q, :first_name, default_order: :desc) %>
 
-<%= search_form_for @q do |f| %>
-  <%= f.label :first_name_or_last_name_or_email_or_country_cont %>
-  <%= f.search_field :first_name_or_last_name_or_email_or_country_cont %>
+<%= search_form_for @q, data: {turbo_frame: :results, turbo_action: 'advance'} do |f| %>
+  <%#= f.label :first_name_or_last_name_or_email_or_country_or_company_name_cont %>
+  <%= f.search_field :first_name_or_last_name_or_email_or_country_or_company_name_cont, oninput: 'this.form.requestSubmit();', autofocus: true, placeholder: 'Search' %>
 
-  <%= f.label :first_name_cont %>
-  <%= f.search_field :first_name_cont %>
-  <%= f.label :last_name_cont %>
-  <%= f.search_field :last_name_cont %>
-  <%= f.label :birthday_eq %>
-  <%= f.date_field :birthday_eq %>
-  <%= f.label :birthday_gteq %>
-  <%= f.date_field :birthday_gteq %>
-  <%= f.label :birthday_lteq %>
-  <%= f.date_field :birthday_lteq %>
+  <%#= f.label :first_name_cont %>
+  <%#= f.search_field :first_name_cont %>
+  <%#= f.label :last_name_cont %>
+  <%#= f.search_field :last_name_cont %>
+  <%#= f.label :birthday_eq %>
+  <%#= f.date_field :birthday_eq %>
+  <%#= f.label :birthday_gteq %>
+  <%#= f.date_field :birthday_gteq %>
+  <%#= f.label :birthday_lteq %>
+  <%#= f.date_field :birthday_lteq %>
   <%= f.label :country_eq %>
-  <%= f.select :country_eq, Employee.pluck(:country).uniq, {include_blank: true}, style: "width: 200px;" %>
+  <%= f.select :country_eq, Employee.pluck(:country).uniq, {include_blank: true}, onchange: 'this.form.requestSubmit();', style: "width: 200px;" %>
   <%= f.label :active_eq %>
   <%= f.select :active_eq, [true, false], {include_blank: true}, style: "width: 200px;" %>
-  <%= f.label :company_name_cont %>
-  <%= f.search_field :company_name_cont %>
+  <%#= f.label :company_name_cont %>
+  <%#= f.search_field :company_name_cont %>
 
-  <%= f.submit %>
+  <%#= f.submit %>
 <% end %>
 
+<%#= turbo_frame_tag :results, data: {turbo_action: 'advance'}, target: "_top" do %>
+<%= turbo_frame_tag :results, data: {turbo_action: 'advance'} do %>
+<%= Time.zone.now %>
 <%== pagy_nav(@pagy) %>
 
 <table>
@@ -51,18 +53,19 @@
   <tbody>
     <% @employees.each do |employee| %>
       <tr>
-        <td><%= highlight employee.first_name, params.dig(:q, :first_name_cont) %></td>
-        <td><%= highlight employee.last_name, params.dig(:q, :last_name_cont) %></td>
+        <td><%= highlight employee.first_name, params.dig(:q, :first_name_or_last_name_or_email_or_country_or_company_name_cont) %></td>
+        <td><%= highlight employee.last_name, params.dig(:q, :first_name_or_last_name_or_email_or_country_or_company_name_cont) %></td>
         <td><%= employee.phone %></td>
-        <td><%= employee.email %></td>
+        <td><%= highlight employee.email, params.dig(:q, :first_name_or_last_name_or_email_or_country_or_company_name_cont) %></td>
         <td><%= employee.birthday %></td>
-        <td><%= employee.country %></td>
+        <td><%= highlight employee.country, params.dig(:q, :first_name_or_last_name_or_email_or_country_or_company_name_cont) %></td>
         <td><%= employee.active %></td>
-        <td><%= employee.company.name %></td>
-        <td><%= link_to 'Show', employee %></td>
+        <td><%= highlight employee.company.name, params.dig(:q, :first_name_or_last_name_or_email_or_country_or_company_name_cont) %></td>
+        <td><%= link_to 'Show', employee, data: { turbo_frame: "_top" } %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
 
 <%== pagy_nav(@pagy) %>
+<% end %>
