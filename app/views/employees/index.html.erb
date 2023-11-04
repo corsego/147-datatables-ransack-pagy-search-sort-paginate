@@ -1,8 +1,8 @@
 <%#= sort_link(@q, :first_name, default_order: :desc) %>
 
-<%= search_form_for @q, data: {turbo_frame: :results, turbo_action: 'advance'} do |f| %>
+<%= search_form_for @q, data: {turbo_frame: :results, turbo_action: 'advance'}, id: :search_form do |f| %>
   <%#= f.label :first_name_or_last_name_or_email_or_country_or_company_name_cont %>
-  <%= f.search_field :first_name_or_last_name_or_email_or_country_or_company_name_cont, oninput: 'this.form.requestSubmit();', autofocus: true, placeholder: 'Search' %>
+  <%= f.search_field :first_name_or_last_name_or_email_or_country_or_company_name_cont, oninput: 'this.form.requestSubmit();', autofocus: true, placeholder: 'Search', class: 'w-full' %>
 
   <%#= f.label :first_name_cont %>
   <%#= f.search_field :first_name_cont %>
@@ -14,58 +14,98 @@
   <%#= f.date_field :birthday_gteq %>
   <%#= f.label :birthday_lteq %>
   <%#= f.date_field :birthday_lteq %>
-  <%= f.label :country_eq %>
-  <%= f.select :country_eq, Employee.pluck(:country).uniq, {include_blank: true}, onchange: 'this.form.requestSubmit();', style: "width: 200px;" %>
-  <%= f.label :active_eq %>
-  <%= f.select :active_eq, [true, false], {include_blank: true}, style: "width: 200px;" %>
+  <%#= f.label :country_eq %>
+  <%#= f.select :country_eq, Employee.pluck(:country).uniq, {include_blank: true}, onchange: 'this.form.requestSubmit();', style: "width: 200px;" %>
+  <%#= f.label :active_eq %>
+  <%#= f.select :active_eq, [true, false], {include_blank: true}, style: "width: 200px;" %>
+
+  <%#= f.label :company_name_in %>
+  <%#= f.select :company_name_in, Company.pluck(:name).uniq, {include_blank: true, multiple: true}, onchange: 'this.form.requestSubmit();', style: "width: 200px;" %>
+  <%#= f.collection_check_boxes(:company_name_in, Company.all, :name, :name, {}, onchange: 'this.form.requestSubmit();') %>
+  <%#= f.collection_check_boxes(:company_name_in, Company.all, :name, :name, {}, onchange: 'this.form.requestSubmit();') do |checkbox| %>
+    <%#= checkbox.check_box %>
+    <%#= checkbox.label %>
+  <%# end %>
+  
   <%#= f.label :company_name_cont %>
   <%#= f.search_field :company_name_cont %>
 
   <%#= f.submit %>
 <% end %>
 
-<%#= turbo_frame_tag :results, data: {turbo_action: 'advance'}, target: "_top" do %>
-<%= turbo_frame_tag :results, data: {turbo_action: 'advance'} do %>
-<%= Time.zone.now %>
-<%== pagy_nav(@pagy) %>
+<div class="flex gap-8 mt-8">
+  <div>
+    <%= radio_button :q, :active_eq, nil, onchange: 'this.form.requestSubmit();', form: :search_form %>
+    <%= label_tag "q_active_eq", "All" %>
+    <br>
+    <%= radio_button :q, :active_eq, "true", onchange: 'this.form.requestSubmit();', form: :search_form %>
+    <%= label_tag "q_active_eq_true", "Active" %>
+    <br>
+    <%#= radio_button_tag "q[active_eq]", "true", (params.dig(:q, :active_eq) == "true"), onchange: 'this.form.requestSubmit();', form: :search_form %>
+    <%= radio_button :q, :active_eq, "false", onchange: 'this.form.requestSubmit();', form: :search_form %>
+    <%= label_tag "q_active_eq_false", "Inactive" %>
 
-<table>
-  <thead>
-    <tr>
-      <th>
-        <%#= sort_link(@q, :first_name, "Name", default_order: :desc) %>
-        <%= sort_link(@q, :first_name, default_order: :desc) do %>
-          ICON
-          Name
-        <% end %>
-      </th>
-      <th><%= sort_link(@q, :last_name) %></th>
-      <th>phone</th>
-      <th><%= sort_link(@q, :email) %></th>
-      <th><%= sort_link(@q, :birthday) %></th>
-      <th><%= sort_link(@q, :country) %></th>
-      <th><%= sort_link(@q, :active) %></th>
-      <th><%= sort_link(@q, :company_name) %></th>
-      <th colspan="1"></th>
-    </tr>
-  </thead>
+    <br>
+    <%= label_tag "q_country_eq", "Country" %>
+    <br>
+    <%= select :q, :country_eq, Employee.pluck(:country).uniq, {include_blank: true}, onchange: 'this.form.requestSubmit();', style: "width: 200px;", form: :search_form %>
+    <%#= select_tag "q[country_eq]", options_for_select(Employee.pluck(:country).uniq, params.dig(:q, :country_eq)), include_blank: true, onchange: 'this.form.requestSubmit();', style: "width: 200px;", form: :search_form %>
 
-  <tbody>
-    <% @employees.each do |employee| %>
-      <tr>
-        <td><%= highlight employee.first_name, params.dig(:q, :first_name_or_last_name_or_email_or_country_or_company_name_cont) %></td>
-        <td><%= highlight employee.last_name, params.dig(:q, :first_name_or_last_name_or_email_or_country_or_company_name_cont) %></td>
-        <td><%= employee.phone %></td>
-        <td><%= highlight employee.email, params.dig(:q, :first_name_or_last_name_or_email_or_country_or_company_name_cont) %></td>
-        <td><%= employee.birthday %></td>
-        <td><%= highlight employee.country, params.dig(:q, :first_name_or_last_name_or_email_or_country_or_company_name_cont) %></td>
-        <td><%= employee.active %></td>
-        <td><%= highlight employee.company.name, params.dig(:q, :first_name_or_last_name_or_email_or_country_or_company_name_cont) %></td>
-        <td><%= link_to 'Show', employee, data: { turbo_frame: "_top" } %></td>
-      </tr>
+    <br>
+    <%= label_tag "q_country_eq", "Company" %>
+    <%= collection_check_boxes(:q, :company_name_in, Company.all, :name, :name, {}, onchange: 'this.form.requestSubmit();', form: :search_form) do |checkbox| %>
+      <div>
+        <%= checkbox.check_box %>
+        <%= checkbox.label %>
+      </div>
     <% end %>
-  </tbody>
-</table>
+  </div>
+  <div>
+    <%#= turbo_frame_tag :results, data: {turbo_action: 'advance'}, target: "_top" do %>
+    <%= turbo_frame_tag :results, data: {turbo_action: 'advance'}, class: "space-y-4" do %>
+    <%= Time.zone.now %>
+    <br>
+    <%== pagy_nav(@pagy) %>
 
-<%== pagy_nav(@pagy) %>
-<% end %>
+    <table>
+      <thead>
+        <tr>
+          <th>
+            <%#= sort_link(@q, :first_name, "Name", default_order: :desc) %>
+            <%= sort_link(@q, :first_name, default_order: :desc) do %>
+              ICON
+              Name
+            <% end %>
+          </th>
+          <th><%= sort_link(@q, :last_name) %></th>
+          <th>phone</th>
+          <th><%= sort_link(@q, :email) %></th>
+          <th><%= sort_link(@q, :birthday) %></th>
+          <th><%= sort_link(@q, :country) %></th>
+          <th><%= sort_link(@q, :active) %></th>
+          <th><%= sort_link(@q, :company_name) %></th>
+          <th colspan="1"></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% @employees.each do |employee| %>
+          <tr>
+            <td><%= highlight employee.first_name, params.dig(:q, :first_name_or_last_name_or_email_or_country_or_company_name_cont) %></td>
+            <td><%= highlight employee.last_name, params.dig(:q, :first_name_or_last_name_or_email_or_country_or_company_name_cont) %></td>
+            <td><%= employee.phone %></td>
+            <td><%= highlight employee.email, params.dig(:q, :first_name_or_last_name_or_email_or_country_or_company_name_cont) %></td>
+            <td><%= employee.birthday %></td>
+            <td><%= highlight employee.country, params.dig(:q, :first_name_or_last_name_or_email_or_country_or_company_name_cont) %></td>
+            <td><%= employee.active %></td>
+            <td><%= highlight employee.company.name, params.dig(:q, :first_name_or_last_name_or_email_or_country_or_company_name_cont) %></td>
+            <td><%= link_to 'Show', employee, data: { turbo_frame: "_top" } %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <%== pagy_nav(@pagy) %>
+    <% end %>
+  </div>
+</div>
